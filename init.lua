@@ -4,7 +4,7 @@ scrollbar = false,
     -- normal format is "key = value". These also handle array like data structures
     -- where a value with no key simply has an implicit numeric key
 
-    math.randomseed(os.time())
+math.randomseed(os.time())
 local headers = {
     -- {
     --         "░██╗░░░░░░░██╗░█████╗░░█████╗░██╗░░██╗",
@@ -90,7 +90,7 @@ local config = {
     -- Configure AstroNvim updates
     updater = {
         remote = "origin", -- remote to use
-        channel = "nightly", -- "stable" or "nightly"
+        channel = "stable", -- "stable" or "nightly"
         version = "latest", -- "latest", tag name, or regex search like "v1.*" to only do updates before v2 (STABLE ONLY)
         branch = "main", -- branch name (NIGHTLY ONLY)
         commit = nil, -- commit hash (NIGHTLY ONLY)
@@ -320,10 +320,10 @@ local config = {
             ["<leader>bt"] = { "<cmd>BufferLineSortByTabs<cr>", desc = "Sort by tabs" },
             -- quick save
             -- ["<C-s>"] = { ":w!<cr>", desc = "Save File" },  -- change description but the same command
-            --
+
             -- Zen Mode & Twilight
-            ["<leader>zz"] = { "<cmd>ZenMode<CR>", "Toggle Zen Mode" },
-            ["<leader>zt"] = { "<cmd>Twilight<CR>", "Toggle Twilight Only" },
+            ["<leader>zz"] = { "<cmd>ZenMode<CR>", desc = "Toggle Zen Mode" },
+            ["<leader>zt"] = { "<cmd>Twilight<CR>", desc = "Toggle Twilight Only" },
 
             -- Hop
             ["s"] = { "<cmd>HopChar1<cr>", desc = "Hop using 1 char" },
@@ -399,7 +399,7 @@ local config = {
             ["<C-u>"] = { "<C-u>zz", desc = "Scroll up" },
 
             -- Improved Paste
-            ["<leader>p"] = { "\"_dP", desc = "Paste without overriding the buffer" },
+            ["<leader>p"] = { "\"_dP", desc="Paste without overriding the buffer" }
 
         },
         v = {
