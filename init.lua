@@ -1,9 +1,3 @@
-scrollbar = false,
-
-    -- You can think of a Lua "table" as a dictionary like data structure the
-    -- normal format is "key = value". These also handle array like data structures
-    -- where a value with no key simply has an implicit numeric key
-
 math.randomseed(os.time())
 local headers = {
     -- {
@@ -50,36 +44,45 @@ local function get_random_header()
     return headers[math.random(#headers)]
 end
 
-vim.opt.shiftwidth = 4
-vim.opt.tabstop = 4
-vim.opt.expandtab = true
-vim.guifont = "CaskaydiaCove NF"
-vim.opt.smartcase = true
-vim.opt.smartindent = true
-vim.opt.autoindent = true
-vim.opt.clipboard = "unnamedplus"
-vim.opt.list = true
-vim.opt.listchars:append "eol:↴"
-
-vim.opt.wrap = false
-
-vim.opt.swapfile = false
-vim.opt.backup = false
-vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
-vim.opt.undofile = true
-
-vim.opt.hlsearch = false
-vim.opt.incsearch = true
-
-vim.opt.termguicolors = true
-
-vim.opt.scrolloff = 8
-vim.opt.signcolumn = "yes"
-vim.opt.isfname:append("@-@")
+-- vim.opt.shiftwidth = 4
+-- vim.opt.tabstop = 4
+-- vim.opt.expandtab = true
+-- vim.guifont = "CaskaydiaCove NF"
+-- vim.opt.smartcase = true
+-- vim.opt.smartindent = true
+-- vim.opt.autoindent = true
+-- vim.opt.clipboard = "unnamedplus"
+-- vim.opt.list = true
+-- vim.opt.listchars:append "eol:↴"
+-- vim.opt.mouse = "a"
+--
+-- vim.opt.wrap = false
+--
+-- vim.opt.swapfile = false
+-- vim.opt.backup = false
+-- vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
+-- vim.opt.undofile = true
+--
+-- vim.opt.hlsearch = false
+-- vim.opt.incsearch = true
+--
+-- vim.opt.termguicolors = true
+--
+-- vim.opt.scrolloff = 8
+-- vim.opt.signcolumn = "yes"
+-- vim.opt.isfname:append("@-@")
 
 vim.g.material_style = "deep ocean"
 --[[ vim.opt.colorcolumn = "120" ]]
 
+vim.opt.fillchars      = [[eob: ,fold: ,foldopen:,foldsep: ,foldclose:]]
+vim.opt.foldcolumn     = "0"
+vim.opt.foldlevel      = 99
+vim.opt.foldlevelstart = -1
+-- vim.opt.foldlevel = 20
+vim.opt.foldmethod     = "expr"
+vim.opt.foldexpr       = "nvim_treesitter#foldexpr()"
+vim.o.foldtext         = [[substitute(getline(v:foldstart),'\\\\t',repeat('\\ ',&tabstop),'g').'...'.trim(getline(v:foldend)) . '  ' . (v:foldend - v:foldstart + 1) . ' lines ']]
 
 if vim.g.neovide then
     vim.g.neovide_cursor_vfx_mode = "railgun"
@@ -159,6 +162,7 @@ local config = {
             autoindent = true,
             clipboard = "unnamedplus",
             list = true,
+            mouse = "a",
 
             swapfile = false,
             backup = false,
@@ -171,6 +175,7 @@ local config = {
             termguicolors = true,
 
             scrolloff = 8,
+
             -- isfname:append("@-@"),
         },
         g = {
@@ -279,8 +284,9 @@ local config = {
             },
         },
         -- add to the global LSP on_attach function
-        -- on_attach = function(client, bufnr)
-        -- end,
+        on_attach = function(client, bufnr)
+            require('virtualtypes').on_attach(client)
+        end,
 
         -- override the mason server-registration function
         -- server_registration = function(server, opts)
@@ -399,7 +405,22 @@ local config = {
             ["<C-u>"] = { "<C-u>zz", desc = "Scroll up" },
 
             -- Improved Paste
-            ["<leader>p"] = { "\"_dP", desc="Paste without overriding the buffer" }
+            ["<leader>p"] = { "\"_dP", desc = "Paste without overriding the buffer" },
+
+            ["<A-Up>"] = { "<C-w>k", desc = "Move to above split" },
+            ["<A-Down>"] = { "<C-w>j", desc = "Move to below split" },
+            ["<A-Left>"] = { "<C-w>h", desc = "Move to left split" },
+            ["<A-Right>"] = { "<C-w>l", desc = "Move to right split" },
+
+            -- Trouble
+            ["<leader>xx"] = { "<cmd>TroubleToggle<cr>", desc = "Toggle Trouble" },
+            ["<leader>xw"] = { "<cmd>TroubleToggle workspace_diagnostics<cr>",
+                desc = "Toggle Trouble for Workspace diagnostics" },
+            ["<leader>xd"] = { "<cmd>TroubleToggle document_diagnostics<cr>",
+                desc = "Toggle Trouble for Document diagnostics" },
+            ["<leader>xl"] = { "<cmd>TroubleToggle loclist<cr>", desc = "Toggle Trouble Local List" },
+            ["<leader>xq"] = { "<cmd>TroubleToggle quickfix<cr>", desc = "Toggle Trouble for Quick Fix" },
+            ["gR"] = { "<cmd>TroubleToggle lsp_references<cr>", desc = "Toggle Trouble for LSP References" },
 
         },
         v = {
@@ -536,14 +557,39 @@ local config = {
                 -- Set a formatter
                 -- null_ls.builtins.formatting.stylua,
                 null_ls.builtins.diagnostics.pylint.with({
-                    diagnostics_postprocess = function(diagnostic)
-                        diagnostic.code = diagnostic.message_id
-                    end,
+                    prefer_local = ".venv/bin",
+                    condition = function(utils)
+                        return utils.root_has_file({ ".pylintrc", "setup.cfg" })
+                    end
+                    -- diagnostics_postprocess = function(diagnostic)
+                    -- diagnostic.code = diagnostic.message_id
+                    -- end,
                 }),
-                null_ls.builtins.formatting.isort,
-                null_ls.builtins.diagnostics.flake8,
-                null_ls.builtins.formatting.black,
-                null_ls.builtins.diagnostics.mypy,
+                null_ls.builtins.formatting.isort.with({
+                    prefer_local = ".venv/bin",
+
+                    condition = function(utils)
+                        return utils.root_has_file({ "setup.cfg" })
+                    end
+                }),
+                null_ls.builtins.diagnostics.flake8.with({
+                    prefer_local = ".venv/bin",
+                    condition = function(utils)
+                        return utils.root_has_file({ "setup.cfg" })
+                    end
+                }),
+                null_ls.builtins.formatting.black.with({
+                    prefer_local = ".venv/bin",
+                    condition = function(utils)
+                        return utils.root_has_file({ "setup.cfg" })
+                    end
+                }),
+                -- null_ls.builtins.diagnostics.mypy.with({
+                --     prefer_local = ".venv/bin",
+                --     condition = function(utils)
+                --         return utils.root_has_file({ "setup.cfg" })
+                --     end
+                -- }),
                 -- null_ls.builtins.formatting.prettier,
             }
             return config -- return final config table
@@ -903,7 +949,9 @@ local config = {
                     -- group name in which-key top level menu
                     ["b"] = { name = "Buffer" },
                     ["z"] = { name = "ZenMode" },
-                    ["?"] = { name = "Cheat.sh" }
+                    ["?"] = { name = "Cheat.sh" },
+                    ["x"] = { name = "Trouble" }
+
                 },
             },
         },
@@ -933,6 +981,38 @@ local config = {
                         alpha_on_bye "bdelete!"
                     end, { desc = "Close buffer" })
                 end
+
+                -- vim.opt.fillchars = [[[eob: ,fold: ,foldopen:,foldsep: ,foldclose:]]
+                -- vim.opt.foldcolumn = "1"
+                -- vim.opt.foldlevel = 99999
+                -- vim.opt.foldlevelstart = -1
+                -- vim.opt.foldenable = true
+
+                vim.opt.fillchars      = [[eob: ,fold: ,foldopen:,foldsep: ,foldclose:]]
+                vim.opt.foldcolumn     = "0"
+                vim.opt.foldlevel      = 99
+                vim.opt.foldlevelstart = -1
+                -- vim.opt.foldlevel = 20
+                vim.opt.foldmethod     = "expr"
+                vim.opt.foldexpr       = "nvim_treesitter#foldexpr()"
+                vim.o.foldtext         = [[substitute(getline(v:foldstart),'\\\\t',repeat('\\ ',&tabstop),'g').'...'.trim(getline(v:foldend)) . '  ' . (v:foldend - v:foldstart + 1) . ' lines ']]
+
+
+                -- local capabilities = vim.lsp.protocol.make_client_capabilities()
+                -- capabilities.textDocument.completion.completionItem.snippetSupport = true
+                -- capabilities.textDocument.foldingRange = {
+                --     dynamicRegistration = false,
+                --     lineFoldingOnly = true,
+                -- }
+                --
+                -- local language_servers = require("lspconfig").util.available_servers() -- or list servers manually like {'gopls', 'clangd'}
+                -- for _, ls in ipairs(language_servers) do
+                --     require('lspconfig')[ls].setup({
+                --         capabilities = capabilities
+                --         -- you can add other fields for setting up lsp server in this table
+                --     })
+                -- end
+
             end,
         }
         -- Set up custom filetypes
@@ -949,5 +1029,7 @@ local config = {
         -- }
     end,
 }
+
+
 
 return config

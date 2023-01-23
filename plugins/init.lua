@@ -12,6 +12,23 @@ return {
         "folke/zen-mode.nvim",
     },
     {
+        'jubnzv/virtual-types.nvim',
+    },
+    -- {
+    --     "sunjon/Shade.nvim",
+    --     config = function()
+    --         require('shade').setup({
+    --             overlay_opacity = 50,
+    --             opacity_step = 1,
+    --             keys = {
+    --                 brightness_up   = '<C-Up>',
+    --                 brightness_down = '<C-Down>',
+    --                 toggle          = '<Leader>s',
+    --             }
+    --         })
+    --     end
+    -- },
+    {
         "marko-cerovac/material.nvim",
         priority = 1000,
         config = function()
@@ -59,7 +76,7 @@ return {
 
                     disable = {
                         colored_cursor = false, -- Disable the colored cursor
-                        borders = false, -- Disable borders between verticaly split windows
+                        borders = false, -- Disable borders between vertically split windows
                         background = false, -- Prevent the theme from setting the background (NeoVim then uses your terminal background)
                         term_colors = false, -- Prevent the theme from setting terminal colors
                         eob_lines = false -- Hide the end-of-buffer lines
@@ -72,7 +89,7 @@ return {
 
                     lualine_style = "stealth", -- Lualine style ( can be 'stealth' or 'default' )
 
-                    async_loading = true, -- Load parts of the theme asyncronously for faster startup (turned on by default)
+                    async_loading = true, -- Load parts of the theme asynchronously for faster startup (turned on by default)
 
                     custom_colors = nil, -- If you want to everride the default colors, set this to a function
 
@@ -183,8 +200,8 @@ return {
         "folke/trouble.nvim",
         config = function()
             require("trouble").setup {
-                auto_open = true,
-                auto_close = true,
+                auto_open = false,
+                auto_close = false,
                 padding = true,
                 height = 10,
                 use_diagnostic_signs = true,
