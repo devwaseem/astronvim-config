@@ -54,7 +54,7 @@ end
 -- vim.opt.clipboard = "unnamedplus"
 -- vim.opt.list = true
 -- vim.opt.listchars:append "eol:↴"
--- vim.opt.mouse = "a"
+vim.opt.mouse = "a"
 --
 -- vim.opt.wrap = false
 --
@@ -284,9 +284,9 @@ local config = {
             },
         },
         -- add to the global LSP on_attach function
-        on_attach = function(client, bufnr)
-            require('virtualtypes').on_attach(client)
-        end,
+        -- on_attach = function(client, bufnr)
+        --
+        -- end,
 
         -- override the mason server-registration function
         -- server_registration = function(server, opts)
@@ -395,10 +395,6 @@ local config = {
 
             ["<leader>?"] = { "<cmd>Cheat<cr>", desc = "Use Cheat.sh" },
 
-            -- Move Lines
-
-            ["J"] = { ":m '>+1<CR>gv=gv", desc = "Move selected visual down" },
-            ["K"] = { ":m '<-2<CR>gv=gv", desc = "Move selected visual down" },
 
             -- Improved navigation
             ["<C-d>"] = { "<C-d>zz", desc = "Scroll down" },
@@ -424,6 +420,11 @@ local config = {
 
         },
         v = {
+            -- Move Lines
+
+            ["J"] = { ":m '>+1<CR>gv=gv", desc = "Move selected visual down" },
+            ["K"] = { ":m '<-2<CR>gv=gv", desc = "Move selected visual down" },
+
             -- Hop
             ["s"] = { "<cmd>HopChar1<cr>", desc = "Hop using 1 char" },
             ["S"] = { "<cmd>HopChar2<cr>", desc = "Hop using 2 char" },
@@ -558,38 +559,43 @@ local config = {
                 -- null_ls.builtins.formatting.stylua,
                 null_ls.builtins.diagnostics.pylint.with({
                     prefer_local = ".venv/bin",
-                    condition = function(utils)
-                        return utils.root_has_file({ ".pylintrc", "setup.cfg" })
-                    end
+                    method = null_ls.methods.DIAGNOSTICS_ON_SAVE,
+                    -- condition = function(utils)
+                    --     return utils.root_has_file({ ".pylintrc", "setup.cfg" })
+                    -- end
                     -- diagnostics_postprocess = function(diagnostic)
                     -- diagnostic.code = diagnostic.message_id
                     -- end,
                 }),
                 null_ls.builtins.formatting.isort.with({
-                    prefer_local = ".venv/bin",
-
-                    condition = function(utils)
-                        return utils.root_has_file({ "setup.cfg" })
-                    end
+                    -- method = null_ls.methods.DIAGNOSTICS_ON_SAVE,
+                    -- prefer_local = ".venv/bin",
+                    --
+                    -- condition = function(utils)
+                    --     return utils.root_has_file({ "setup.cfg" })
+                    -- end
                 }),
                 null_ls.builtins.diagnostics.flake8.with({
-                    prefer_local = ".venv/bin",
-                    condition = function(utils)
-                        return utils.root_has_file({ "setup.cfg" })
-                    end
+                    method = null_ls.methods.DIAGNOSTICS_ON_SAVE,
+                    -- prefer_local = ".venv/bin",
+                    -- condition = function(utils)
+                    --     return utils.root_has_file({ "setup.cfg" })
+                    -- end
                 }),
                 null_ls.builtins.formatting.black.with({
-                    prefer_local = ".venv/bin",
-                    condition = function(utils)
-                        return utils.root_has_file({ "setup.cfg" })
-                    end
+                    -- method = null_ls.methods.DIAGNOSTICS_ON_SAVE,
+                    -- prefer_local = ".venv/bin",
+                    -- condition = function(utils)
+                    --     return utils.root_has_file({ "setup.cfg" })
+                    -- end
                 }),
-                -- null_ls.builtins.diagnostics.mypy.with({
-                --     prefer_local = ".venv/bin",
-                --     condition = function(utils)
-                --         return utils.root_has_file({ "setup.cfg" })
-                --     end
-                -- }),
+                null_ls.builtins.diagnostics.mypy.with({
+                    method = null_ls.methods.DIAGNOSTICS_ON_SAVE,
+                    prefer_local = ".venv/bin",
+                    -- condition = function(utils)
+                    --     return utils.root_has_file({ "setup.cfg" })
+                    -- end
+                }),
                 -- null_ls.builtins.formatting.prettier,
             }
             return config -- return final config table
@@ -613,7 +619,7 @@ local config = {
             },
             rainbow = {
                 enable = true,
-                disable = { "html" },
+                disable = {},
                 extended_mode = false,
                 max_files_lines = nil,
             },
